@@ -25,7 +25,7 @@ jobs:
         run: |
           rm -rf .workshop-content
           mkdir -p .workshop-content
-          cp -a Bootstrapper/. .workshop-content/
+          cp -a source/. .workshop-content/
 
       - name: Publish Workshop Item
         uses: community-owned-workshop/steam-workshop-devops@v1
