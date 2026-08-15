@@ -20,22 +20,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Prepare Workshop Content
-        shell: bash
-        run: |
-          rm -rf .workshop-content
-          mkdir -p .workshop-content
-          cp -a source/. .workshop-content/
-
       - name: Publish Workshop Item
         uses: community-owned-workshop/steam-workshop-devops@feature/scrap-mechanic
         with:
           app-id: 387990
           published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
-          content-path: .workshop-content
-          metadata-path: workshop/workshop.txt
+          content-path: source/
+          metadata-path: workshop/-minimal.txt
           preview-path: workshop/preview.png
-          changelog: ${{ inputs.changelog }}
         env:
           STEAM_ACCOUNT_NAME: ${{ secrets.STEAM_USERNAME }}
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
