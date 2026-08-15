@@ -1,0 +1,42 @@
+name: Publish to Steam Workshop
+
+on:
+  workflow_dispatch:
+    inputs:
+      changelog:
+        description: Steam Workshop change note
+        required: false
+        default: Workshop update
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: steam
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare Workshop Content
+        shell: bash
+        run: |
+          rm -rf .workshop-content
+          mkdir -p .workshop-content
+          cp -a Bootstrapper/. .workshop-content/
+
+      - name: Publish Workshop Item
+        uses: community-owned-workshop/steam-workshop-devops@v1
+        with:
+          app-id: 387990
+          published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
+          content-path: .workshop-content
+          metadata-path: workshop/workshop.txt
+          preview-path: workshop/preview.png
+          changelog: ${{ inputs.changelog }}
+        env:
+          STEAM_ACCOUNT_NAME: ${{ secrets.STEAM_USERNAME }}
+          STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
+          STEAM_CONFIG_VDF: ${{ secrets.STEAM_CONFIG_VDF }}

@@ -1,0 +1,18 @@
+{
+  "name": "Mod Bootstrapper",
+  "version": "0.1.0",
+  "authors": [
+    "Slothsoft"
+  ],
+  "summary": "Compatibility layer for Scrap Mechanic Survival mods that need to register content in shared vanilla files.",
+  "repositoryUrl": "https://github.com/community-owned-workshop/scrap-mechanic-bootstrapper",
+  "workshop": {
+    "id": "3784073427",
+    "visibility": 2,
+    "tags": [
+      "Mod",
+      "Survival",
+      "1.0"
+    ]
+  }
+}
