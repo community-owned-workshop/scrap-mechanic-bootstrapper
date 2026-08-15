@@ -27,7 +27,7 @@ jobs:
           published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
           content-path: source/
           metadata-path: workshop/workshop.txt
-          preview-path: workshop/preview.png
+          preview-path: workshop/preview.jpg
         env:
           STEAM_ACCOUNT_NAME: ${{ secrets.STEAM_USERNAME }}
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
