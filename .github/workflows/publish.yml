@@ -28,7 +28,7 @@ jobs:
           cp -a source/. .workshop-content/
 
       - name: Publish Workshop Item
-        uses: community-owned-workshop/steam-workshop-devops@v1
+        uses: community-owned-workshop/steam-workshop-devops@feature/scrap-mechanic
         with:
           app-id: 387990
           published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
