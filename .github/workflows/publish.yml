@@ -26,7 +26,7 @@ jobs:
           app-id: 387990
           published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
           content-path: source/
-          metadata-path: workshop/workshop-minimal.txt
+          metadata-path: workshop/workshop.txt
         env:
           STEAM_ACCOUNT_NAME: ${{ secrets.STEAM_USERNAME }}
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
