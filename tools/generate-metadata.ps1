@@ -10,7 +10,7 @@ $DevOpsRepository = "https://github.com/community-owned-workshop/steam-workshop-
 
 # Use the feature branch while testing. Change this to the released version once
 # Scrap Mechanic support has been merged and released.
-$DevOpsVersion = "feature/scrap-mechanic"
+$DevOpsVersion = "v1.2"
 
 $TemporaryDirectory = Join-Path `
     ([System.IO.Path]::GetTempPath()) `
