@@ -43,9 +43,7 @@ C:\Program Files (x86)\Steam\steamapps\workshop\content\387990\3784073427\Start-
 ```
 
 
-> ‼️ **If your path has spaces, you need to put [double quotes](https://en.wikipedia.org/wiki/Quotation_mark) around 
-> them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a 
-> complete example here.**
+> ‼️ **If your path has spaces, you need to put [double quotes](https://en.wikipedia.org/wiki/Quotation_mark) around them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a complete example here.**
 
 
 If you want to test the bootstrapper directly, go to its folder and execute:
