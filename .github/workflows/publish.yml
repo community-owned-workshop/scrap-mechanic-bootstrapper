@@ -29,7 +29,7 @@ jobs:
       # The Scrap Mechanic profile also creates source/description.json, which is
       # consumed by Scrap Mechanic itself after the Workshop content is installed.
       - name: 🪅 Generate metadata
-        uses: community-owned-workshop/steam-workshop-devops/profiles/scrap-mechanic/metadata@1.2
+        uses: community-owned-workshop/steam-workshop-devops/profiles/scrap-mechanic/metadata@v1.2
         with:
           metadata-path: metadata.json
           description-path: description.md
@@ -39,7 +39,7 @@ jobs:
           mod-description-output-path: source/description.json
           
       - name: 🛜 Publish Workshop Item
-        uses: community-owned-workshop/steam-workshop-devops@1.2
+        uses: community-owned-workshop/steam-workshop-devops@v1.2
         with:
           app-id: 387990
           published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
