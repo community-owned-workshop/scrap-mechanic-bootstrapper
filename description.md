@@ -31,19 +31,31 @@ from clean vanilla files.
 Then add this to the Launch Options in Steam:
 
 ```
-"<SteamWorkshopFolder>\<ModID>\Start-ScrapMechanic.cmd" %command% 
+(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% 
 ```
+
+**Example:**
+
+_(**387990** is the ID for Scrap Mechanic, **3784073427** is the ID of this mod.)_
+
+```
+C:\Program Files (x86)\Steam\steamapps\workshop\content\387990\3784073427\Start-ScrapMechanic.cmd %command% 
+```
+
+
+> ‼️ **If your path has spaces, you need to put [double quotes](https://en.wikipedia.org/wiki/Quotation_mark) around them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a complete example here.**
+
 
 If you want to test the bootstrapper directly, go to its folder and execute:
 
 ```powershell
-.\Bootstrapper.ps1 -GamePath "<SteamFolder>\steamapps\common\Scrap Mechanic" -NoLaunch
+.\Bootstrapper.ps1 -GamePath (SteamFolder)\steamapps\common\Scrap Mechanic -NoLaunch
 ```
 
 **Example:**
 
 ```powershell
-.\Bootstrapper.ps1 -GamePath "C:\Program Files (x86)\Steam\steamapps\common\Scrap Mechanic" -NoLaunch
+.\Bootstrapper.ps1 -GamePath C:\Program Files (x86)\Steam\steamapps\common\Scrap Mechanic -NoLaunch
 ```
 
 

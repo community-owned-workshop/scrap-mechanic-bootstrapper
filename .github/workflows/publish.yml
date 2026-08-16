@@ -20,21 +20,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Prepare Workshop Content
-        shell: bash
-        run: |
-          rm -rf .workshop-content
-          mkdir -p .workshop-content
-          cp -a source/. .workshop-content/
-
-      - name: Publish Workshop Item
+      # Generate all derived metadata from the repository's single metadata source.
+      # The Scrap Mechanic profile also creates source/description.json, which is
+      # consumed by Scrap Mechanic itself after the Workshop content is installed.
+      - name: 🪅 Generate metadata
+        uses: community-owned-workshop/steam-workshop-devops/profiles/scrap-mechanic/metadata@feature/scrap-mechanic
+        with:
+          metadata-path: metadata.json
+          description-path: description.md
+          readme-template-path: tools/templates/README.md
+          readme-output-path: README.md
+          workshop-output-path: workshop/workshop.txt
+          mod-description-output-path: source/description.json
+          
+      - name: 🛜 Publish Workshop Item
         uses: community-owned-workshop/steam-workshop-devops@feature/scrap-mechanic
         with:
           app-id: 387990
           published-file-id: ${{ secrets.STEAM_WORKSHOP_ID }}
-          content-path: .workshop-content
+          content-path: source/
           metadata-path: workshop/workshop.txt
-          preview-path: workshop/preview.png
+          preview-path: workshop/preview.jpg
           changelog: ${{ inputs.changelog }}
         env:
           STEAM_ACCOUNT_NAME: ${{ secrets.STEAM_USERNAME }}

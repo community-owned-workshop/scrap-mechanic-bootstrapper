@@ -1,5 +1,6 @@
 ﻿# ---------------------------------------------------------------------------------------------------------------------
-# Generates README.md and workshop/workshop.txt using the generic steam-workshop-devops metadata generator.
+# Generates README.md, workshop/workshop.txt and source/description.json from metadata.json.
+# Game-specific metadata generation lives in the Scrap Mechanic profile of steam-workshop-devops.
 # ---------------------------------------------------------------------------------------------------------------------
 
 $ErrorActionPreference = "Stop"
@@ -7,8 +8,8 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path $PSScriptRoot -Parent
 $DevOpsRepository = "https://github.com/community-owned-workshop/steam-workshop-devops.git"
 
-# Use the feature branch while testing. Change this to v1 (or the released version)
-# once the generic metadata generator has been released.
+# Use the feature branch while testing. Change this to the released version once
+# Scrap Mechanic support has been merged and released.
 $DevOpsVersion = "feature/scrap-mechanic"
 
 $TemporaryDirectory = Join-Path `
@@ -21,7 +22,6 @@ $LocationPushed = $false
 try {
     $env:DOTNET_ROLL_FORWARD = "Major"
 
-    # Download exactly the DevOps version used to generate the repository metadata.
     git -c advice.detachedHead=false clone `
         --quiet `
         --depth 1 `
@@ -36,12 +36,18 @@ try {
     Push-Location $Root
     $LocationPushed = $true
 
-    # Scrap Mechanic does not need a game-specific metadata step. The generic generator creates both files
-    # from metadata.json, description.md and tools/templates/README.md.
+    # The profile first invokes the generic metadata generator and then creates
+    # Scrap Mechanic's source/description.json from the same metadata.json.
     & "$TemporaryDirectory/metadata/generate-metadata.ps1"
-
     if ($LASTEXITCODE -ne 0) {
-        throw "Metadata generation failed."
+        throw "Generic metadata generation failed."
+    }
+
+    & "$TemporaryDirectory/profiles/scrap-mechanic/metadata/generate-description.ps1" `
+        -MetadataPath "metadata.json" `
+        -OutputPath "source/description.json"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Scrap Mechanic metadata generation failed."
     }
 }
 finally {
