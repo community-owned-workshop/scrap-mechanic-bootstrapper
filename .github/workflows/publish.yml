@@ -20,6 +20,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Generate all derived metadata from the repository's single metadata source.
+      # The Scrap Mechanic profile also creates source/description.json, which is
+      # consumed by Scrap Mechanic itself after the Workshop content is installed.
+      - name: Generate metadata
+        uses: community-owned-workshop/steam-workshop-devops/profiles/scrap-mechanic/metadata@feature/scrap-mechanic
+        with:
+          metadata-path: metadata.json
+          description-path: description.md
+          readme-template-path: tools/templates/README.md
+          readme-output-path: README.md
+          workshop-output-path: workshop/workshop.txt
+          mod-description-output-path: source/description.json
+
       - name: Publish Workshop Item
         uses: community-owned-workshop/steam-workshop-devops@feature/scrap-mechanic
         with:
