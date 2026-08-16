@@ -1,4 +1,4 @@
-name: Publish to Steam Workshop
+name: ♨️ Publish to Steam Workshop
 
 on:
   workflow_dispatch:
@@ -8,6 +8,11 @@ on:
         required: false
         default: Workshop update
         type: string
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
   publish:
