@@ -16,5 +16,5 @@
 - _source/_ - Workshop / runtime files
 - _metadata.json_ - project and Steam meta data
 - _description.md_ - shared human-readable description used for _README.md_ and Steam's _workshop.txt_
-- _tools/templates/README.md_ - _README.md_ template (missing _metadata.json and _description.md_)
+- _tools/templates/README.md_ - _README.md_ template (values from _metadata.json and _description.md_ are missing)
 - _.github/workflows/publish.yml_ - meta data generation and Steam upload

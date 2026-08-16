@@ -1,4 +1,4 @@
-<!-- Generated file. Edit metadata.json, description.md, or the README template instead. -->
+﻿<!-- Generated file. Edit metadata.json, description.md, or the README template instead. -->
 
 # Mod Bootstrapper
 
@@ -42,11 +42,16 @@ Then add this to the Launch Options in Steam:
 
 **Example:**
 
+_(**387990** is the ID for Scrap Mechanic, **3784073427** is the ID of this mod.)_
+
 ```
 C:\Program Files (x86)\Steam\steamapps\workshop\content\387990\3784073427\Start-ScrapMechanic.cmd %command% 
 ```
 
-**387990** is the ID for Scrap Mechanic, **3784073427** is the ID of this mod.
+
+> ‼️ **If your path has spaces, you need to put [double quotes](https://en.wikipedia.org/wiki/Quotation_mark) around 
+> them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a 
+> complete example here.**
 
 
 If you want to test the bootstrapper directly, go to its folder and execute:
@@ -84,5 +89,5 @@ Experimental. Initially tested against Scrap Mechanic 1.0.5.876 on Windows.
 - _source/_ - Workshop / runtime files
 - _metadata.json_ - project and Steam meta data
 - _description.md_ - shared human-readable description used for _README.md_ and Steam's _workshop.txt_
-- _tools/templates/README.md_ - _README.md_ template (missing _metadata.json and _description.md_)
+- _tools/templates/README.md_ - _README.md_ template (values from _metadata.json and _description.md_ are missing)
 - _.github/workflows/publish.yml_ - meta data generation and Steam upload
