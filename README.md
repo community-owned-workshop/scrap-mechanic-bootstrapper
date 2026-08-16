@@ -49,9 +49,7 @@ C:\Program Files (x86)\Steam\steamapps\workshop\content\387990\3784073427\Start-
 ```
 
 
-> ‼️ **If your path has spaces, you need to put [double quotes](https://en.wikipedia.org/wiki/Quotation_mark) around 
-> them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a 
-> complete example here.**
+> ‼️ **If your path has spaces, you need to put [double quotes](https://en.wikipedia.org/wiki/Quotation_mark) around them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a complete example here.**
 
 
 If you want to test the bootstrapper directly, go to its folder and execute:
@@ -91,3 +89,7 @@ Experimental. Initially tested against Scrap Mechanic 1.0.5.876 on Windows.
 - _description.md_ - shared human-readable description used for _README.md_ and Steam's _workshop.txt_
 - _tools/templates/README.md_ - _README.md_ template (values from _metadata.json and _description.md_ are missing)
 - _.github/workflows/publish.yml_ - meta data generation and Steam upload
+
+## Examples
+
+- [Closable Vacuum Pipe](https://github.com/community-owned-workshop/scrap-mechanic-closable-vacuum-pipe)

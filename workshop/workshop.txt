@@ -43,9 +43,7 @@ description=[/code]
 description=
 description=
 description=[quote]
-description=‼️ [b]If your path has spaces, you need to put [url=https://en.wikipedia.org/wiki/Quotation_mark]double quotes[/url] around 
-description=them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a 
-description=complete example here.[/b]
+description=‼️ [b]If your path has spaces, you need to put [url=https://en.wikipedia.org/wiki/Quotation_mark]double quotes[/url] around them. Unfortunately, SteamCMD won't let me publish this description with double quotes in it, so I can't provide a complete example here.[/b]
 description=[/quote]
 description=
 description=If you want to test the bootstrapper directly, go to its folder and execute:
@@ -78,4 +76,4 @@ description=[*][b]Authors:[/b] Slothsoft
 description=[*][b]Source:[/b] [url=https://github.com/community-owned-workshop/scrap-mechanic-bootstrapper]GitHub[/url]
 description=[/list]
 tags=Mod;Survival;1.0
-visibility=2
+visibility=0

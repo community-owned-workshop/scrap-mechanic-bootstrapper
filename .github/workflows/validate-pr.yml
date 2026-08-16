@@ -19,4 +19,4 @@ concurrency:
 
 jobs:
   validate:
-    uses: community-owned-workshop/steam-workshop-devops/.github/workflows/validate-scrap-mechanic.yml@feature/scrap-mechanic
+    uses: community-owned-workshop/steam-workshop-devops/.github/workflows/validate-scrap-mechanic.yml@v1.2
