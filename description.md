@@ -31,7 +31,7 @@ from clean vanilla files.
 Then add this to the Launch Options in Steam:
 
 ```
-"[SteamWorkshopFolder]\387990\3784073427\Start-ScrapMechanic.cmd" %command% 
+"(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd" %command% 
 ```
 
 **Example:**
@@ -46,7 +46,7 @@ Then add this to the Launch Options in Steam:
 If you want to test the bootstrapper directly, go to its folder and execute:
 
 ```powershell
-.\Bootstrapper.ps1 -GamePath "[SteamFolder]\steamapps\common\Scrap Mechanic" -NoLaunch
+.\Bootstrapper.ps1 -GamePath "(SteamFolder)\steamapps\common\Scrap Mechanic" -NoLaunch
 ```
 
 **Example:**
