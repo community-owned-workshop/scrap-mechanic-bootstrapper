@@ -1,0 +1,22 @@
+name: ✅ Validate Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    uses: community-owned-workshop/steam-workshop-devops/.github/workflows/validate-scrap-mechanic.yml@feature/scrap-mechanic
