@@ -77,10 +77,10 @@ Experimental. Initially tested against Scrap Mechanic 1.0.5.876 on Windows.
 
 ## Technical Information
 
-- **Version:** 0.1.0
+- **Version:** 0.2.0
 - **Authors:** Slothsoft
 - **Source:** https://github.com/community-owned-workshop/scrap-mechanic-bootstrapper
-- **Steam Workshop:** https://steamcommunity.com/sharedfiles/filedetails/?id=3784073427
+- **Steam Workshop:** [3784073427](https://steamcommunity.com/sharedfiles/filedetails/?id=3784073427)
 
 ## Repository Layout
 

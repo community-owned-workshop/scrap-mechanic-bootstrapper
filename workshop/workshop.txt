@@ -71,7 +71,7 @@ description=
 description=[hr][/hr]
 description=[h2]Technical information[/h2]
 description=[list]
-description=[*][b]Version:[/b] 0.1.0
+description=[*][b]Version:[/b] 0.2.0
 description=[*][b]Authors:[/b] Slothsoft
 description=[*][b]Source:[/b] [url=https://github.com/community-owned-workshop/scrap-mechanic-bootstrapper]GitHub[/url]
 description=[/list]

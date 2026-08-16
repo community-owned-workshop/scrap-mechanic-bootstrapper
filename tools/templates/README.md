@@ -9,7 +9,7 @@
 - **Version:** {{VERSION}}
 - **Authors:** {{AUTHORS}}
 - **Source:** {{REPOSITORY_URL}}
-- **Steam Workshop:** {{WORKSHOP_URL}}
+- **Steam Workshop:** [{{WORKSHOP_ID}}]({{WORKSHOP_URL}})
 
 ## Repository Layout
 
