@@ -14,5 +14,12 @@
       "Survival",
       "1.0"
     ]
+  },
+  "scrapMechanic": {
+    "localId": "ba363286-5534-49dd-8832-81d04410637a",
+    "type": "Blocks and Parts",
+    "allowAddMods": true,
+    "customIcons": false,
+    "description": "Compatibility layer for Scrap Mechanic Survival mods that need to register content in shared vanilla files."
   }
 }
