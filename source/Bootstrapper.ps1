@@ -31,10 +31,7 @@
 #>
 
 param(
-    [string]$GamePath,
-    [switch]$NoLaunch,
-    [Parameter(ValueFromRemainingArguments=$true)]
-    [string[]]$GameCommand
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -74,11 +71,6 @@ function Read-SmJson([string]$p) {
     $raw=[IO.File]::ReadAllText($p)
     try { (Remove-SmJsonComments $raw) | ConvertFrom-Json }
     catch { throw "Invalid Scrap Mechanic JSON '$p': $($_.Exception.Message)" }
-}
-
-if(!$GamePath -and $GameCommand -and $GameCommand.Count -gt 0) {
-    $candidate = $GameCommand[0].Trim('"')
-    if(Test-Path -LiteralPath $candidate) { $GamePath = Split-Path -Parent $candidate }
 }
 if(!$GamePath) {
     $default = "${env:ProgramFiles(x86)}\Steam\steamapps\common\Scrap Mechanic"
@@ -221,10 +213,37 @@ Log "Found $($mods.Count) bootstrap mod(s)."
 
 # Claims make collisions explicit instead of silently overwriting each other.
 $claims=@{}
-foreach($mod in $mods){ foreach($c in @($mod.Manifest.claims)){ if($claims.ContainsKey($c)){ throw "Collision: '$c' claimed by '$($claims[$c])' and '$($mod.Manifest.name)'" }; $claims[$c]=$mod.Manifest.name } }
+foreach($mod in $mods){
+    foreach($c in @(GetProp $mod.Manifest 'claims' @())){ if($claims.ContainsKey($c)){ throw "Collision: '$c' claimed by '$($claims[$c])' and '$($mod.Manifest.name)'" }; $claims[$c]=$mod.Manifest.name } }
 
 # File-copy collisions are allowed only when bytes are identical.
 $copyClaims=@{}
+$textReplaceRestored=@{}
+function TextReplaceOne([string]$dst,[string]$find,[string]$replace,[string]$modName){
+    if([string]::IsNullOrEmpty($find)){ throw "textReplace find must not be empty in '$modName'" }
+    PrepareTarget $dst
+    $raw=[IO.File]::ReadAllText($dst)
+    $matches=([regex]::Matches($raw,[regex]::Escape($find))).Count
+    if($matches -ne 1){ throw "textReplace in '$modName' expected exactly 1 match in $dst, found $matches" }
+    WriteUtf8 $dst $raw.Replace($find,$replace)
+}
+
+function RegexReplaceOne([string]$dst,[string]$pattern,[string]$replace,[string]$modName){
+    if([string]::IsNullOrEmpty($pattern)){ throw "regexReplace pattern must not be empty in '$modName'" }
+    if(!(Test-Path -LiteralPath $dst)){ throw "textReplace target not found: $dst" }
+    if(!$textReplaceRestored.ContainsKey($dst)){
+        $rel=$dst.Substring($GamePath.Length).TrimStart('\')
+        $backup=Join-Path $backupRoot $rel
+        if(Test-Path -LiteralPath $backup){ Copy-Item -LiteralPath $backup -Destination $dst -Force }
+        else { EnsureDir (Split-Path -Parent $backup); Copy-Item -LiteralPath $dst -Destination $backup -Force }
+        $textReplaceRestored[$dst]=$rel
+    }
+    $raw=[IO.File]::ReadAllText($dst)
+    $matches=([regex]::Matches($raw,$pattern)).Count
+    if($matches -ne 1){ throw "regexReplace in '$modName' expected exactly 1 match in $dst, found $matches" }
+    WriteUtf8 $dst ([regex]::Replace($raw,$pattern,$replace))
+}
+
 function CopyOne([string]$src,[string]$dst,[string]$modName){
     if(!(Test-Path $src)){ throw "Missing source: $src" }
     $h=HashFile $src
@@ -237,6 +256,44 @@ foreach($mod in $mods){
     $name=$mod.Manifest.name; Log "Applying $name"
     foreach($op in $mod.Manifest.operations){
         switch($op.type){
+		'luaInsertAfter' {
+				$dst = Full $GamePath $op.target
+				$raw = [IO.File]::ReadAllText($dst)
+
+				$marker = [string]$op.marker
+				$value  = [string]$op.value
+
+				# Bereits gepatcht
+				if ($raw.Contains($value)) {
+					Write-Host "[SM bootstrap] Already applied luaInsertAfter"
+					continue
+				}
+
+				$i = $raw.IndexOf($marker)
+				if ($i -lt 0) {
+					throw "Lua marker not found in $dst"
+				}
+
+				$i += $marker.Length
+
+				$raw = $raw.Insert(
+					$i,
+					[Environment]::NewLine + $value
+				)
+
+				WriteUtf8 $dst $raw
+			}
+		'rename' {
+				$src = Full $GamePath $op.source
+				$dst = Full $GamePath $op.target
+
+				if (Test-Path -LiteralPath $src) {
+					if (Test-Path -LiteralPath $dst) {
+						throw "rename target already exists: $dst"
+					}
+					Move-Item -LiteralPath $src -Destination $dst
+				}
+			}
             # Copy one mod-owned file into the Survival tree.
         'copy' { CopyOne (Full $mod.Root $op.source) (Full $GamePath $op.target) $name }
             # Copy a complete mod-owned asset directory (meshes, textures, renderables, ...).
@@ -290,7 +347,13 @@ foreach($mod in $mods){
     }; SaveJson $dst $j
             }
             # Insert one Lua expression into a known vanilla list at a stable marker.
-        'luaListAdd' {
+            'textReplace' {
+                TextReplaceOne (Full $GamePath $op.target) ([string]$op.find) ([string]$op.replace) $name
+            }
+        'regexReplace' {
+                RegexReplaceOne (Full $GamePath $op.target) ([string]$op.pattern) ([string]$op.replace) $name
+            }
+            'luaListAdd' {
                 $dst=Full $GamePath $op.target; $raw=[IO.File]::ReadAllText($dst); if($raw -notmatch [regex]::Escape([string]$op.value)){ $i=$raw.IndexOf([string]$op.marker); if($i -lt 0){throw "Lua marker not found in $dst"}; $i += ([string]$op.marker).Length; $raw=$raw.Insert($i,[Environment]::NewLine+"`t"+[string]$op.value); WriteUtf8 $dst $raw }
             }
             # Allocate an icon slot centrally and update both XML metadata and the atlas PNG.
@@ -321,6 +384,9 @@ $generatedRows = foreach($rel in $baselineTargets) {
     $file=Join-Path $GamePath $rel
     "$rel=$((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash)"
 }
+$generatedRows += foreach($dst in $textReplaceRestored.Keys) {
+    "$($textReplaceRestored[$dst])=$((Get-FileHash -LiteralPath $dst -Algorithm SHA256).Hash)"
+}
 $generatedBytes=[Text.Encoding]::UTF8.GetBytes(($generatedRows -join "`n"))
 $generatedSha=[Security.Cryptography.SHA256]::Create()
 try { $generatedHash=([BitConverter]::ToString($generatedSha.ComputeHash($generatedBytes))).Replace('-','') }
@@ -328,30 +394,28 @@ finally { $generatedSha.Dispose() }
 $hashFile = Join-Path $PSScriptRoot '.generated-state.sha256'
 $previousHash = if(Test-Path -LiteralPath $hashFile){ (Get-Content -LiteralPath $hashFile -Raw).Trim() } else { $null }
 
-if($previousHash -ne $generatedHash) {
-    $coreData = Join-Path $GamePath 'Cache\Bundle\core_data.cbo'
-    if(Test-Path -LiteralPath $coreData) {
-        Remove-Item -LiteralPath $coreData -Force
-        Log 'Content changed -> deleted Cache\Bundle\core_data.cbo'
-    } else {
-        Log 'Content changed -> core_data.cbo already absent'
-    }
-    Set-Content -LiteralPath $hashFile -Value $generatedHash -Encoding ASCII
-} else {
-    Log 'Content unchanged -> keeping core_data.cbo'
+if ($generatedHash -ne $previousHash) {
+    Log "Generated files changed - invalidating cache bundles"
+
+	$bundleFiles = @(
+		'core_data.cbo',
+		'survival_shape_physics.cbo',
+		'survival_asset_physics.cbo'
+	)
+
+	foreach ($file in $bundleFiles) {
+		$path = Join-Path $GamePath "Cache\Bundle\$file"
+		if (Test-Path $path) {
+			Remove-Item -LiteralPath $path -Force
+		}
+	}
+
+	Set-Content `
+		-LiteralPath $hashFile `
+		-Value $generatedHash `
+		-Encoding ASCII
 }
 
 Log 'Bootstrap v14 complete.'
-
-if(!$NoLaunch){
-    if($GameCommand -and $GameCommand.Count -gt 0){
-        $exe=$GameCommand[0].Trim('"')
-        $args=@()
-        if($GameCommand.Count -gt 1){$args=$GameCommand[1..($GameCommand.Count-1)]}
-        Start-Process -FilePath $exe -ArgumentList $args
-    } else {
-        Start-Process -FilePath $exePath -WorkingDirectory (Split-Path -Parent $exePath)
-    }
-}
 
 try { Stop-Transcript | Out-Null } catch {}
