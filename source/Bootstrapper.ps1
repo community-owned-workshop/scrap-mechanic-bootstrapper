@@ -199,11 +199,58 @@ $userRoot=Join-Path $env:APPDATA 'Axolot Games\Scrap Mechanic\User'
 if(Test-Path $userRoot){ Get-ChildItem $userRoot -Directory -Filter 'User_*' | ForEach-Object { $m=Join-Path $_.FullName 'Mods'; if(Test-Path $m){$roots.Add($m)} } }
 $roots.Add((Split-Path -Parent $PSScriptRoot))
 
-$manifestFiles=@()
-foreach($root in $roots | Select-Object -Unique){
-    Get-ChildItem -LiteralPath $root -Filter bootstrap.json -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $manifestFiles += $_.FullName }
+function Find-BootstrapManifests {
+    param(
+        [string]$Path,
+        [hashtable]$Visited
+    )
+
+    if (!(Test-Path -LiteralPath $Path -PathType Container)) {
+        return
+    }
+
+    # Resolve symlinks / junctions to their actual target.
+    try {
+        $resolvedPath = (Get-Item -LiteralPath $Path -Force).FullName
+
+        # In Windows PowerShell 5.1 Resolve-Path on the child path gives us
+        # the canonical filesystem location after following reparse points.
+        $resolvedPath = (Resolve-Path -LiteralPath $resolvedPath -ErrorAction Stop).Path
+    }
+    catch {
+        return
+    }
+
+    # Prevent loops and scanning the same directory multiple times.
+    $key = $resolvedPath.TrimEnd('\').ToLowerInvariant()
+    if ($Visited.ContainsKey($key)) {
+        return
+    }
+    $Visited[$key] = $true
+
+    # Manifest directly in this directory
+    $manifest = Join-Path $resolvedPath 'bootstrap.json'
+    if (Test-Path -LiteralPath $manifest -PathType Leaf) {
+        $manifest
+    }
+
+    # Recurse manually so symlink/junction directories are followed too.
+    Get-ChildItem -LiteralPath $resolvedPath -Directory -Force -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                Find-BootstrapManifests -Path $_.FullName -Visited $Visited
+            }
 }
-$manifestFiles=$manifestFiles | Select-Object -Unique
+
+$manifestFiles = @()
+$visitedDirectories = @{}
+
+foreach ($root in $roots | Select-Object -Unique) {
+    $manifestFiles += Find-BootstrapManifests `
+        -Path $root `
+        -Visited $visitedDirectories
+}
+
+$manifestFiles = $manifestFiles | Select-Object -Unique
 $mods=@()
 foreach($mf in $manifestFiles){
     try { $m=Get-Content $mf -Raw | ConvertFrom-Json; if($m.schemaVersion -eq 1 -and $m.operations){ $mods += [pscustomobject]@{Root=(Split-Path -Parent $mf); Manifest=$m; File=$mf} } }
