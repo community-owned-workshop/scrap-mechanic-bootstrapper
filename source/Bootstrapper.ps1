@@ -31,8 +31,7 @@
 #>
 
 param(
-    [string]$GamePath,
-    [switch]$EnableDevAchievements
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -172,9 +171,7 @@ $baselineTargets = @(
 
 Log "Scrap Mechanic version: $gameVersion"
 
-if($EnableDevAchievements) {
-    Enable-DevAchievementsPatch $exePath
-}
+Enable-DevAchievementsPatch $exePath
 
 if(!(Test-Path -LiteralPath $backupRoot)) {
     Log "Creating vanilla baseline: $backupRoot"
