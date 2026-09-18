@@ -61,7 +61,7 @@ If you want to test the bootstrapper directly, go to its folder and execute:
 
 ## Achievements in developer mode
 
-The launcher passes `-dev` to Scrap Mechanic and enables the bootstrapper's guarded achievement patch.
+The bootstrapper always enables its guarded achievement patch; use `-dev` in the Steam launch options for developer mode.
 Only the executable's achievement guard is changed. Before writing, the bootstrapper verifies the expected
 original bytes and creates `Release\ScrapMechanic.exe.bootstrapper.bak`. If an update changes the executable,
 the patch stops without modifying it. Steam's **Verify integrity of game files** restores the original executable.
