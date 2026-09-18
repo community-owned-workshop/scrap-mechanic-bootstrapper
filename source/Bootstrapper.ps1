@@ -33,6 +33,8 @@
 param(
     [string]$GamePath,
     [switch]$EnableDevAchievements,
+    [Alias('dev')]
+    [switch]$LaunchDev,
     [switch]$NoLaunch,
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$GameCommand
@@ -411,9 +413,12 @@ if(!$NoLaunch){
         $exe=$GameCommand[0].Trim('"')
         $args=@()
         if($GameCommand.Count -gt 1){$args=$GameCommand[1..($GameCommand.Count-1)]}
+        if($LaunchDev){ $args += '-dev' }
         Start-Process -FilePath $exe -ArgumentList $args
     } else {
-        Start-Process -FilePath $exePath -WorkingDirectory (Split-Path -Parent $exePath)
+        $args=@()
+        if($LaunchDev){ $args += '-dev' }
+        Start-Process -FilePath $exePath -ArgumentList $args -WorkingDirectory (Split-Path -Parent $exePath)
     }
 }
 
