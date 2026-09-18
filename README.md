@@ -37,7 +37,7 @@ from clean vanilla files.
 Then add this to the Launch Options in Steam:
 
 ```
-(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% 
+(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% -dev
 ```
 
 **Example:**
@@ -45,7 +45,7 @@ Then add this to the Launch Options in Steam:
 _(**387990** is the ID for Scrap Mechanic, **3784073427** is the ID of this mod.)_
 
 ```
-C:\Program Files (x86)\Steam\steamapps\workshop\content\387990\3784073427\Start-ScrapMechanic.cmd %command% 
+C:\Program Files (x86)\Steam\steamapps\workshop\content\387990\3784073427\Start-ScrapMechanic.cmd %command% -dev
 ```
 
 
@@ -64,6 +64,14 @@ If you want to test the bootstrapper directly, go to its folder and execute:
 .\Bootstrapper.ps1 -GamePath C:\Program Files (x86)\Steam\steamapps\common\Scrap Mechanic -NoLaunch
 ```
 
+
+## Achievements in developer mode
+
+The launcher passes `-dev` to Scrap Mechanic and enables the bootstrapper's guarded achievement patch.
+Only the executable's achievement guard is changed. Before writing, the bootstrapper verifies the
+expected original bytes and creates `Release\ScrapMechanic.exe.bootstrapper.bak`. If an update changes
+the executable, the patch stops without modifying it. Steam's **Verify integrity of game files** restores
+the original executable.
 
 ## Cache
 
