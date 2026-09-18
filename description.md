@@ -31,7 +31,7 @@ from clean vanilla files.
 Then add this to the Launch Options in Steam:
 
 ```
-(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% 
+(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% -dev
 ```
 
 **Example:**
@@ -58,6 +58,13 @@ If you want to test the bootstrapper directly, go to its folder and execute:
 .\Bootstrapper.ps1 -GamePath C:\Program Files (x86)\Steam\steamapps\common\Scrap Mechanic -NoLaunch
 ```
 
+
+## Achievements in developer mode
+
+The bootstrapper always enables its guarded achievement patch; use `-dev` in the Steam launch options for developer mode.
+Only the executable's achievement guard is changed. Before writing, the bootstrapper verifies the expected
+original bytes and creates `Release\ScrapMechanic.exe.bootstrapper.bak`. If an update changes the executable,
+the patch stops without modifying it. Steam's **Verify integrity of game files** restores the original executable.
 
 ## Cache
 
