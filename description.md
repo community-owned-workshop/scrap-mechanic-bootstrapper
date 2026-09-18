@@ -31,7 +31,7 @@ from clean vanilla files.
 Then add this to the Launch Options in Steam:
 
 ```
-(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% -dev-dev
+(SteamWorkshopFolder)\387990\3784073427\Start-ScrapMechanic.cmd %command% -dev
 ```
 
 **Example:**
