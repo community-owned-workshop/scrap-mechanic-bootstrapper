@@ -32,6 +32,7 @@
 
 param(
     [string]$GamePath,
+    [switch]$EnableDevAchievements,
     [switch]$NoLaunch,
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$GameCommand
@@ -44,6 +45,57 @@ function Log([string]$s) { Write-Host "[SM bootstrap] $s" }
 function HashFile([string]$p) { if(Test-Path -LiteralPath $p){ (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash } else { $null } }
 function EnsureDir([string]$p) { if($p -and !(Test-Path -LiteralPath $p)){ New-Item -ItemType Directory -Force -Path $p | Out-Null } }
 function Full([string]$base,[string]$rel) { [IO.Path]::GetFullPath((Join-Path $base ($rel -replace '/','\'))) }
+
+# Enables Steam achievements while Scrap Mechanic runs with -dev.
+# This deliberately changes only the achievement guard in ScrapMechanic.exe.
+# Original and patched bytes are checked before any write.
+function Enable-DevAchievementsPatch([string]$Path) {
+    $offset = [int]0x7740b0
+    [byte[]]$expected = @(0x74, 0x60)
+    [byte[]]$patched = @(0xEB, 0x60)
+    [byte[]]$bytes = [IO.File]::ReadAllBytes($Path)
+
+    if($bytes.Length -lt ($offset + $expected.Length)) {
+        throw "Achievement patch is not supported for this Scrap Mechanic version (file too small)."
+    }
+
+    $isExpected = $true
+    $isPatched = $true
+    for($i = 0; $i -lt $expected.Length; $i++) {
+        if($bytes[$offset + $i] -ne $expected[$i]) { $isExpected = $false }
+        if($bytes[$offset + $i] -ne $patched[$i]) { $isPatched = $false }
+    }
+
+    if($isPatched) {
+        Log 'Dev achievements patch already applied.'
+        return
+    }
+    if(!$isExpected) {
+        $actual = '{0:X2} {1:X2}' -f $bytes[$offset], $bytes[$offset + 1]
+        throw "Achievement patch is not supported for this Scrap Mechanic version. Expected 74 60 at 0x7740B0, found $actual. The executable was not changed."
+    }
+
+    $backup = $Path + '.bootstrapper.bak'
+    if(!(Test-Path -LiteralPath $backup)) {
+        Copy-Item -LiteralPath $Path -Destination $backup
+        Log "Backed up executable: $backup"
+    }
+
+    for($i = 0; $i -lt $patched.Length; $i++) {
+        $bytes[$offset + $i] = $patched[$i]
+    }
+
+    $temporary = $Path + '.bootstrapper.tmp'
+    try {
+        [IO.File]::WriteAllBytes($temporary, $bytes)
+        Move-Item -LiteralPath $temporary -Destination $Path -Force
+    } finally {
+        if(Test-Path -LiteralPath $temporary) {
+            Remove-Item -LiteralPath $temporary -Force
+        }
+    }
+    Log 'Enabled achievements while using -dev.'
+}
 
 # Scrap Mechanic uses JSON files containing // and /* ... */ comments.
 # Windows PowerShell 5.1 ConvertFrom-Json cannot parse those comments, so they
@@ -78,7 +130,14 @@ function Read-SmJson([string]$p) {
 
 if(!$GamePath -and $GameCommand -and $GameCommand.Count -gt 0) {
     $candidate = $GameCommand[0].Trim('"')
-    if(Test-Path -LiteralPath $candidate) { $GamePath = Split-Path -Parent $candidate }
+    if(Test-Path -LiteralPath $candidate) {
+        $candidateDirectory = Split-Path -Parent $candidate
+        if((Split-Path -Leaf $candidateDirectory) -eq 'Release') {
+            $GamePath = Split-Path -Parent $candidateDirectory
+        } else {
+            $GamePath = $candidateDirectory
+        }
+    }
 }
 if(!$GamePath) {
     $default = "${env:ProgramFiles(x86)}\Steam\steamapps\common\Scrap Mechanic"
@@ -127,6 +186,10 @@ $baselineTargets = @(
 )
 
 Log "Scrap Mechanic version: $gameVersion"
+
+if($EnableDevAchievements) {
+    Enable-DevAchievementsPatch $exePath
+}
 
 if(!(Test-Path -LiteralPath $backupRoot)) {
     Log "Creating vanilla baseline: $backupRoot"
